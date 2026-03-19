@@ -33,10 +33,10 @@ html,body{width:100%;height:100%;overflow:hidden;}
 body{
   font-family:'Lilita One',cursive;
   background:#0a0018;
-  display:flex;align-items:center;justify-content:center;
+  display:block;
   position:relative;
 }
-#game-shell{ transform-origin: top center; }
+#game-shell{ transform-origin: top left; position:absolute; }
 
 /* ═══════════════════════════════════════════════
    BACKGROUND — CANDY LAND SKY
@@ -1460,16 +1460,19 @@ init();
 // ── VIEWPORT SCALE FIT ──────────────────────────
 function scaleGame(){
   const shell = document.getElementById('game-shell');
-  const padV = 16; // px breathing room top+bottom
-  const padH = 16;
-  const scaleX = (window.innerWidth  - padH) / shell.scrollWidth;
-  const scaleY = (window.innerHeight - padV) / shell.scrollHeight;
-  const scale  = Math.min(scaleX, scaleY, 1); // never upscale
+  const padV = 24;
+  const padH = 32;
+  // Use offsetWidth/offsetHeight for actual rendered size
+  const scaleX = (window.innerWidth  - padH) / shell.offsetWidth;
+  const scaleY = (window.innerHeight - padV) / shell.offsetHeight;
+  const scale  = Math.min(scaleX, scaleY, 1);
   shell.style.transform = `scale(${scale})`;
-  // re-center after scale
-  const scaledH = shell.scrollHeight * scale;
-  const offsetY = Math.max(0, (window.innerHeight - scaledH) / 2);
-  shell.style.marginTop = offsetY + 'px';
+  shell.style.transformOrigin = 'top left';
+  // Centre horizontally and vertically
+  const scaledW = shell.offsetWidth  * scale;
+  const scaledH = shell.offsetHeight * scale;
+  shell.style.marginLeft = Math.max(0, (window.innerWidth  - scaledW) / 2) + 'px';
+  shell.style.marginTop  = Math.max(0, (window.innerHeight - scaledH) / 2) + 'px';
 }
 scaleGame();
 window.addEventListener('resize', scaleGame);
