@@ -447,6 +447,184 @@ body{
    PARTICLES
 ═══════════════════════════════════════════════ */
 #particle-canvas{position:fixed;inset:0;z-index:400;pointer-events:none;}
+
+/* ═══════════════════════════════════════════════
+   MOBILE STYLES
+═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  html,body{ overflow:hidden; touch-action:manipulation; }
+
+  #game-shell{
+    width:100vw; height:100dvh;
+    display:flex; flex-direction:column;
+    padding:0; gap:0;
+    transform:none !important;
+    margin:0 !important;
+  }
+
+  /* hide bg canvas on mobile for perf */
+  #bg-canvas{ display:none; }
+  body{ background: linear-gradient(180deg,#3d1080 0%,#1a0533 60%,#0d0020 100%); }
+
+  /* brand bar */
+  #brand-bar{ padding:4px 0 2px; }
+  #game-logo{ font-size:18px; letter-spacing:1px; }
+
+  /* stage — vertical stack, no left panel */
+  #stage{
+    flex:1; flex-direction:column;
+    padding:0 6px; gap:5px;
+    overflow:hidden;
+  }
+
+  /* hide left panel on mobile — moved to sheet */
+  #left-panel{ display:none; }
+
+  /* main game fills all space */
+  #main-game{
+    flex:1; display:flex; flex-direction:column;
+    gap:5px; min-height:0;
+  }
+
+  #pays-banner{
+    font-size:9px; letter-spacing:1px; padding:4px 6px;
+  }
+
+  #fs-bar{ font-size:12px; padding:4px 10px; }
+
+  /* reel frame fills remaining space */
+  #reel-wrap{ flex:1; min-height:0; }
+  #reel-inner{ height:100%; padding:6px; }
+  #grid{
+    height:100%;
+    grid-template-columns:repeat(6,1fr);
+    grid-template-rows:repeat(5,1fr);
+    gap:4px;
+  }
+
+  .cell{ border-radius:9px; }
+  .cell-bg{ border-radius:9px; }
+  .cell-glare{ border-radius:9px; }
+
+  /* bottom bar */
+  #bottom-bar{
+    padding:8px 10px;
+    border-radius:12px;
+    margin-bottom:4px;
+    flex-shrink:0;
+  }
+  .cred-row{ font-size:11px; gap:5px; }
+  #win-msg{ font-size:14px; min-width:120px; }
+
+  /* spin controls */
+  .spin-area{ gap:8px; }
+  .adj-wrap .bet-label{ font-size:8px; }
+  .adj-btn{ width:34px; height:34px; font-size:18px; }
+  #spin-btn{
+    width:58px; height:58px; font-size:26px;
+    border-width:3px;
+  }
+  #auto-btn{ font-size:9px; padding:4px 9px; }
+
+  /* mobile info button — opens side panel */
+  #mobile-info-btn{
+    display:flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(255,210,80,.15); border:1.5px solid rgba(255,210,80,.4);
+    color:var(--gold-bright); font-size:16px; cursor:pointer;
+    font-family:'Lilita One',cursive;
+  }
+
+  /* side sheet overlay */
+  #side-sheet{
+    display:flex;
+  }
+}
+
+/* hide mobile-only elements on desktop */
+#mobile-info-btn{ display:none; }
+#side-sheet{ display:none; }
+
+/* ── SIDE SHEET (mobile info panel) ── */
+#side-sheet{
+  position:fixed; inset:0; z-index:600;
+  background:rgba(0,0,0,.75); backdrop-filter:blur(4px);
+  align-items:flex-end; justify-content:flex-start;
+}
+#side-sheet-inner{
+  width:78vw; max-width:320px; height:100dvh;
+  background:linear-gradient(160deg,rgba(20,5,60,.97),rgba(8,0,28,.98));
+  border-right:2px solid rgba(255,210,80,.3);
+  display:flex; flex-direction:column; gap:8px;
+  padding:16px 12px; overflow-y:auto;
+}
+#side-sheet-close{
+  align-self:flex-end;
+  background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.2);
+  border-radius:50%; width:32px; height:32px;
+  color:#fff; font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+/* sheet copies of left panel elements */
+.sheet-buy-card{
+  border-radius:14px; padding:10px 8px; text-align:center;
+  cursor:pointer; color:#fff; font-family:'Lilita One',cursive;
+  position:relative; overflow:hidden;
+  transition:transform .14s;
+}
+.sheet-buy-card:active{ transform:scale(.97); }
+.sheet-buy-card.pink{ background:linear-gradient(145deg,#ff6eb5,#cc006a); border:2.5px solid #ff9dd4; }
+.sheet-buy-card.orange{ background:linear-gradient(145deg,#ffad40,#e06000); border:2.5px solid #ffcf7a; }
+.sheet-buy-card .lbl{ font-size:10px; font-family:'Nunito',sans-serif; font-weight:900; opacity:.9; }
+.sheet-buy-card .sw{ font-size:16px; color:var(--gold-bright); display:block; }
+.sheet-buy-card .pr{ font-size:19px; color:#fff; }
+
+.sheet-bet-panel{
+  background:linear-gradient(145deg,#1a6b20,#0a3d0e);
+  border:2.5px solid #4ec154; border-radius:14px; padding:10px 8px; text-align:center;
+}
+.sheet-bet-panel .lbl{ font-size:10px; color:#b8ffb8; font-family:'Nunito',sans-serif; font-weight:800; }
+.sheet-bet-panel .amt{ font-size:24px; color:var(--gold-bright); }
+.sheet-bet-panel .sub{ font-size:9px; color:#a0ffa0; font-family:'Nunito',sans-serif; font-weight:800; line-height:1.3; margin-top:2px; }
+
+.sheet-dtoggle{
+  display:flex; align-items:center; justify-content:center; gap:5px;
+  margin:5px auto 0; width:fit-content;
+  background:rgba(0,0,0,.35); border:2px solid #444; border-radius:20px;
+  padding:4px 12px; color:#ccc; font-size:12px; cursor:pointer;
+  font-family:'Nunito',sans-serif; font-weight:900; transition:all .2s;
+}
+.sheet-dtoggle.on{ background:rgba(0,150,0,.4); border-color:#4ec154; color:#b8ffb8; }
+
+.sheet-mult{
+  background:linear-gradient(145deg,rgba(0,0,0,.5),rgba(20,0,50,.5));
+  border:2px solid rgba(255,215,0,.35); border-radius:14px;
+  padding:8px; text-align:center;
+}
+.sheet-mult .mlbl{ font-size:10px; color:#ccc; font-family:'Nunito',sans-serif; font-weight:700; }
+.sheet-mult-val{ font-size:28px; color:var(--gold-bright); text-shadow:0 0 18px rgba(255,215,0,.8); }
+
+.sheet-paytable{
+  background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.1);
+  border-radius:12px; padding:8px 10px;
+  font-size:10px; color:#ccc; font-family:'Nunito',sans-serif; font-weight:700;
+}
+.sheet-pt-row{ display:flex; justify-content:space-between; align-items:center; padding:3px 0; border-bottom:1px solid rgba(255,255,255,.06); }
+.sheet-pt-row:last-child{ border:none; }
+.sheet-rtp{ text-align:center; font-size:10px; color:rgba(255,255,255,.35); font-family:'Nunito',sans-serif; font-weight:700; margin-top:4px; }
+
+/* landscape mobile — keep side panel, shrink grid */
+@media (max-width:900px) and (orientation:landscape) {
+  #game-shell{ flex-direction:row; height:100dvh; }
+  #stage{ flex-direction:row; }
+  #left-panel{ display:flex; width:130px; }
+  #left-panel .buy-card .bc-price{ font-size:15px; }
+  #left-panel #bet-panel .bp-amount{ font-size:20px; }
+  #left-panel #mult-val{ font-size:24px; }
+  #mobile-info-btn{ display:none !important; }
+  body{ overflow:hidden; }
+  #game-shell{ transform:none !important; margin:0 !important; }
+}
 </style>
 </head>
 <body>
@@ -515,6 +693,7 @@ body{
         </div>
         <div id="win-msg">PLACE YOUR BETS!</div>
         <div class="spin-area">
+          <button id="mobile-info-btn" onclick="openSheet()">☰</button>
           <div class="adj-wrap">
             <div class="bet-label">BET</div>
             <button class="adj-btn" onclick="chgBet(-1)">−</button>
@@ -1439,14 +1618,18 @@ function updateUI(){
   document.getElementById('credit-el').textContent='$'+credit.toFixed(2);
   document.getElementById('buy-fs-price').textContent='$'+(bet*100).toFixed(2);
   document.getElementById('buy-super-price').textContent='$'+(bet*500).toFixed(2);
+  // sync sheet
+  const sd=document.getElementById('sheet-bet-display');
+  const sbf=document.getElementById('sheet-buy-fs-price');
+  const sbs=document.getElementById('sheet-buy-super-price');
+  if(sd) sd.textContent='$'+bet.toFixed(2);
+  if(sbf) sbf.textContent='$'+(bet*100).toFixed(2);
+  if(sbs) sbs.textContent='$'+(bet*500).toFixed(2);
+  // sync mult
+  const smv=document.getElementById('sheet-mult-val');
+  if(smv) smv.textContent=document.getElementById('mult-val').textContent;
 }
 function chgBet(d){ if(isSpinning)return; betIdx=Math.max(0,Math.min(BETS.length-1,betIdx+d)); updateUI(); }
-function toggleDouble(){
-  doubleOn=!doubleOn;
-  const btn=document.getElementById('double-btn');
-  btn.classList.toggle('on',doubleOn);
-  btn.querySelector('span').textContent=doubleOn?'ON':'OFF';
-}
 function toggleAuto(){
   isAuto=!isAuto;
   const btn=document.getElementById('auto-btn');
@@ -1464,8 +1647,40 @@ function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 // ═══════════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════════
+function openSheet(){
+  document.getElementById('side-sheet').style.display='flex';
+}
+function closeSheet(e){
+  if(!e || e.target===document.getElementById('side-sheet')||e.target===document.getElementById('side-sheet-close')){
+    document.getElementById('side-sheet').style.display='none';
+  }
+}
+function toggleDouble(){
+  doubleOn=!doubleOn;
+  ['double-btn','sheet-double-btn'].forEach(id=>{
+    const b=document.getElementById(id); if(!b) return;
+    b.classList.toggle('on',doubleOn);
+    b.querySelector('span').textContent=doubleOn?'ON':'OFF';
+  });
+}
+
+function buildSheetPaytable(){
+  const el=document.getElementById('sheet-paytable');
+  if(!el) return;
+  const order=['HEART','BLUE','PURPLE','PEACH','APPLE','BANANA','WATERMELON','GRAPE','LOLLIPOP'];
+  el.innerHTML=order.map(k=>{
+    const iconSvg=SYMS[k]?SYMS[k].replace('<svg ','<svg width="24" height="24" '):'';
+    const payStr=k===SCATTER?'BONUS TRIGGER':`8×:${PAY[k][8]}  12×:${PAY[k][12]}`;
+    return `<div class="sheet-pt-row">
+      <span style="width:24px;height:24px;flex-shrink:0">${iconSvg}</span>
+      <div style="text-align:right"><span style="font-size:8.5px;color:rgba(255,255,255,.45);display:block">${SYM_NAMES[k]}</span><span style="font-size:9.5px;color:var(--gold-bright)">${payStr}</span></div>
+    </div>`;
+  }).join('');
+}
+
 function init(){
   buildPaytable();
+  buildSheetPaytable();
   grid=makeGrid(); renderGrid(grid); updateUI();
 }
 init();
@@ -1490,5 +1705,40 @@ function scaleGame(){
 scaleGame();
 window.addEventListener('resize', scaleGame);
 </script>
+<!-- MOBILE SIDE SHEET -->
+<div id="side-sheet" onclick="closeSheet(event)">
+  <div id="side-sheet-inner">
+    <button id="side-sheet-close" onclick="closeSheet()">✕</button>
+
+    <div class="sheet-buy-card pink" onclick="buyFS(false);closeSheet()">
+      <div class="lbl">BUY FREE SPINS</div>
+      <div class="pr" id="sheet-buy-fs-price">$200.00</div>
+    </div>
+    <div class="sheet-buy-card orange" onclick="buyFS(true);closeSheet()">
+      <div class="lbl">BUY</div>
+      <span class="sw">SUPER</span>
+      <div class="lbl">FREE SPINS</div>
+      <div class="pr" id="sheet-buy-super-price">$1,000.00</div>
+    </div>
+
+    <div class="sheet-bet-panel">
+      <div class="lbl">BET</div>
+      <div class="amt" id="sheet-bet-display">$2.00</div>
+      <div class="sub">DOUBLE CHANCE TO WIN FEATURE</div>
+      <div class="sheet-dtoggle" id="sheet-double-btn" onclick="toggleDouble()">
+        <div class="db-dot"></div><span>OFF</span>
+      </div>
+    </div>
+
+    <div class="sheet-mult">
+      <div class="mlbl">TOTAL MULTIPLIER</div>
+      <div class="sheet-mult-val" id="sheet-mult-val">×1</div>
+    </div>
+
+    <div class="sheet-paytable" id="sheet-paytable"></div>
+    <div class="sheet-rtp">RTP: 96.53%</div>
+  </div>
+</div>
+
 </body>
 </html>
