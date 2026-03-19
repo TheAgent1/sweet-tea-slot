@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sweet Tea 1000</title>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@700;800;900;1000&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --gold-bright:#ffe55a;
+  --gold-mid:#f5c000;
+  --gold-dark:#b87a00;
+  --gold-shadow:#7a4d00;
+  --pink-bright:#ff6eb5;
+  --pink-mid:#e8006e;
+  --pink-dark:#8a0040;
+  --sky-top:#5ab8ff;
+  --sky-bot:#c9eaff;
+  --candy-bg:#ffc8e8;
+  --green-top:#52d440;
+  --green-bot:#1a8a0a;
+  --ui-dark:rgba(10,0,35,0.82);
+  --ui-border:rgba(255,210,80,0.6);
+  --cell-bg-a:rgba(255,230,255,0.22);
+  --cell-bg-b:rgba(200,140,255,0.12);
+}
+
+html,body{width:100%;height:100%;overflow:hidden;}
+body{
+  font-family:'Lilita One',cursive;
+  background:#0a0018;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+#game-shell{ transform-origin: top center; }
+
+/* ═══════════════════════════════════════════════
+   BACKGROUND — CANDY LAND SKY
+═══════════════════════════════════════════════ */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ═══════════════════════════════════════════════
+   GAME SHELL
+═══════════════════════════════════════════════ */
+#game-shell{
+  position:relative;z-index:10;
+  width:min(98vw,1080px);
+  display:flex;flex-direction:column;align-items:center;
+  gap:0;
+}
+
+/* ── TOP BRAND BAR ── */
+#brand-bar{
+  width:100%;
+  display:flex;align-items:center;justify-content:center;
+  padding:6px 0 4px;
+  position:relative;
+}
+#game-logo{
+  font-size:clamp(18px,3.2vw,34px);
+  color:var(--gold-bright);
+  text-shadow:0 0 20px rgba(255,220,60,.9),0 3px 0 var(--gold-dark),0 6px 12px rgba(0,0,0,.7);
+  letter-spacing:2px;
+  -webkit-text-stroke:1px var(--gold-dark);
+}
+#game-logo span{color:#fff;-webkit-text-stroke:1px rgba(200,100,0,.5);}
+
+
+/* ── MAIN STAGE ── */
+#stage{
+  width:100%;
+  display:flex;gap:10px;align-items:stretch;
+  padding:0 8px;
+}
+
+/* ═══════════════════════════════════════════════
+   LEFT PANEL
+═══════════════════════════════════════════════ */
+#left-panel{
+  width:clamp(130px,14vw,155px);flex-shrink:0;
+  display:flex;flex-direction:column;gap:7px;
+  padding:4px 0;
+}
+
+/* ── BUY BUTTONS ── */
+.buy-card{
+  border-radius:14px;padding:9px 7px 8px;text-align:center;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .14s ease,filter .14s;
+  border:2.5px solid;
+}
+.buy-card::before{/* shimmer */
+  content:'';position:absolute;top:0;left:-80%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+  animation:shimmer 2.6s ease-in-out infinite;
+}
+@keyframes shimmer{0%{left:-80%}100%{left:140%}}
+.buy-card:hover{transform:scale(1.04) translateY(-1px);filter:brightness(1.1);}
+.buy-card:active{transform:scale(.98);}
+.buy-card.pink{
+  background:linear-gradient(160deg,#ff6eb5 0%,#cc006a 55%,#8a003e 100%);
+  border-color:#ff9dd4;
+  box-shadow:0 6px 22px rgba(200,0,100,.55),inset 0 1px 0 rgba(255,255,255,.35);
+}
+.buy-card.orange{
+  background:linear-gradient(160deg,#ffad40 0%,#e06000 55%,#8a3000 100%);
+  border-color:#ffcf7a;
+  box-shadow:0 6px 22px rgba(200,90,0,.55),inset 0 1px 0 rgba(255,255,255,.35);
+}
+.buy-card .bc-label{font-size:9.5px;letter-spacing:1.2px;color:rgba(255,255,255,.88);font-family:'Nunito',sans-serif;font-weight:900;line-height:1.3;}
+.buy-card .bc-super{font-size:17px;color:var(--gold-bright);display:block;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.5);}
+.buy-card .bc-price{font-size:20px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6);line-height:1.15;}
+
+/* ── BET PANEL ── */
+#bet-panel{
+  background:linear-gradient(160deg,#1c7a22 0%,#0d4a12 100%);
+  border:2.5px solid #5dd462;border-radius:14px;padding:9px 7px;
+  text-align:center;
+  box-shadow:0 5px 18px rgba(60,180,60,.4),inset 0 1px 0 rgba(255,255,255,.2);
+}
+#bet-panel .bp-label{font-size:9px;color:#b8ffb8;font-family:'Nunito',sans-serif;font-weight:900;letter-spacing:1px;}
+#bet-panel .bp-amount{font-size:26px;color:var(--gold-bright);text-shadow:0 2px 8px rgba(0,0,0,.5);line-height:1.1;}
+#bet-panel .bp-sub{font-size:9px;color:#a0ffa0;font-family:'Nunito',sans-serif;font-weight:800;line-height:1.3;margin-top:2px;}
+#double-btn{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  margin:5px auto 0;width:fit-content;
+  background:rgba(0,0,0,.35);border:2px solid #444;border-radius:20px;
+  padding:3px 10px;color:#ccc;font-size:11px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-weight:900;transition:all .2s;
+}
+#double-btn.on{background:rgba(0,150,0,.4);border-color:#5dd462;color:#b8ffb8;}
+#double-btn .db-dot{width:8px;height:8px;border-radius:50%;background:#555;transition:background .2s;}
+#double-btn.on .db-dot{background:#5dd462;}
+
+/* ── MULTIPLIER BOX ── */
+#mult-box{
+  background:linear-gradient(160deg,rgba(20,5,60,.9),rgba(5,0,25,.95));
+  border:2px solid rgba(255,210,80,.4);border-radius:14px;
+  padding:8px 7px;text-align:center;
+  box-shadow:0 0 24px rgba(255,200,0,.1),inset 0 0 20px rgba(255,200,0,.04);
+}
+#mult-box .mb-label{font-size:9px;color:rgba(255,255,255,.5);font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:.8px;}
+#mult-val{
+  font-size:30px;color:var(--gold-bright);
+  text-shadow:0 0 20px rgba(255,220,60,.8),0 2px 0 var(--gold-dark);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1),color .25s;
+}
+#mult-val.bump{animation:multBump .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes multBump{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
+
+/* ── PAYTABLE ── */
+#paytable{
+  background:rgba(0,0,0,.45);border:1px solid rgba(255,210,80,.2);
+  border-radius:12px;padding:6px 8px;flex:1;overflow:hidden;
+}
+.pt-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:2.5px 0;border-bottom:1px solid rgba(255,255,255,.06);
+}
+.pt-row:last-child{border:none;}
+.pt-icon{width:26px;height:26px;flex-shrink:0;}
+.pt-data{text-align:right;}
+.pt-sym-name{font-size:8.5px;color:rgba(255,255,255,.45);font-family:'Nunito',sans-serif;font-weight:700;display:block;}
+.pt-pay{font-size:9.5px;color:var(--gold-bright);font-family:'Nunito',sans-serif;font-weight:900;}
+#rtp-line{text-align:center;font-size:9px;color:rgba(255,255,255,.3);font-family:'Nunito',sans-serif;font-weight:700;margin-top:4px;letter-spacing:.5px;}
+
+/* ═══════════════════════════════════════════════
+   MAIN GAME
+═══════════════════════════════════════════════ */
+#main-game{flex:1;display:flex;flex-direction:column;gap:7px;}
+
+/* ── BANNER ── */
+#pays-banner{
+  text-align:center;padding:5px 12px;border-radius:10px;
+  background:linear-gradient(90deg,rgba(255,210,50,.04),rgba(255,210,50,.16),rgba(255,210,50,.04));
+  border:1.5px solid rgba(255,210,50,.35);
+  font-size:clamp(10px,1.6vw,13px);letter-spacing:2.5px;
+  color:var(--gold-bright);font-family:'Nunito',sans-serif;font-weight:900;text-transform:uppercase;
+  text-shadow:0 0 12px rgba(255,210,50,.5);
+}
+
+/* ── FREE SPIN BAR ── */
+#fs-bar{
+  display:none;text-align:center;padding:6px;border-radius:10px;
+  background:linear-gradient(90deg,rgba(255,190,0,.08),rgba(255,190,0,.22),rgba(255,190,0,.08));
+  border:2px solid var(--gold-mid);
+  font-size:14px;color:var(--gold-bright);font-family:'Nunito',sans-serif;font-weight:900;
+  animation:fsGlow 1.1s ease-in-out infinite alternate;
+}
+#fs-bar.show{display:block;}
+@keyframes fsGlow{
+  from{box-shadow:0 0 6px rgba(255,200,0,.3);}
+  to{box-shadow:0 0 24px rgba(255,200,0,.9),0 0 48px rgba(255,160,0,.4);}
+}
+
+/* ── REEL FRAME ── */
+#reel-wrap{
+  position:relative;border-radius:18px;
+  padding:3px;/* gold ring */
+  background:linear-gradient(145deg,#ffe066,#f5a800,#c87000,#f5a800,#ffe066);
+  box-shadow:0 0 0 1px rgba(255,240,120,.3),
+             0 0 60px rgba(255,180,0,.35),
+             0 8px 40px rgba(0,0,0,.6),
+             inset 0 0 0 2px rgba(255,240,120,.15);
+}
+#reel-inner{
+  border-radius:16px;overflow:hidden;
+  background:linear-gradient(160deg,rgba(210,150,255,.18) 0%,rgba(255,180,230,.14) 50%,rgba(150,100,255,.18) 100%);
+  padding:10px;
+  position:relative;
+}
+/* subtle candy-sky tint overlay inside reels */
+#reel-inner::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% -10%,rgba(255,255,255,.13) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── GRID ── */
+#grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-template-rows:repeat(5,1fr);
+  gap:6px;
+  position:relative;z-index:1;
+}
+
+/* ── CELL ── */
+.cell{
+  width:100%;aspect-ratio:1;
+  position:relative;border-radius:12px;overflow:visible;
+  cursor:default;user-select:none;
+}
+/* cell background tile */
+.cell-bg{
+  position:absolute;inset:0;border-radius:12px;overflow:hidden;
+  background:radial-gradient(ellipse at 45% 30%,rgba(255,255,255,.2),rgba(220,160,255,.08) 55%,rgba(80,20,180,.15));
+  border:1.5px solid rgba(255,255,255,.22);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.28),
+    inset 0 -2px 0 rgba(0,0,0,.32),
+    0 3px 10px rgba(0,0,0,.45);
+}
+/* top glass sheen */
+.cell-bg::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:46%;
+  background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,transparent 100%);
+  border-radius:10px 10px 0 0;pointer-events:none;
+}
+/* bottom ambient */
+.cell-bg::after{
+  content:'';position:absolute;bottom:0;left:8%;right:8%;height:22%;
+  background:linear-gradient(0deg,rgba(255,255,255,.08),transparent);
+  pointer-events:none;
+}
+/* symbol SVG */
+.cell-sym{
+  position:absolute;inset:3px;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+}
+.cell-sym svg{width:100%;height:100%;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6));}
+/* top glare over symbol */
+.cell-glare{
+  position:absolute;inset:0;border-radius:12px;z-index:3;pointer-events:none;
+  background:radial-gradient(ellipse at 40% 18%,rgba(255,255,255,.3) 0%,rgba(255,255,255,.08) 35%,transparent 65%);
+}
+
+/* win state */
+.cell.winning .cell-bg{
+  background:radial-gradient(ellipse at 50% 40%,rgba(255,230,80,.35),rgba(255,180,0,.15));
+  border-color:var(--gold-bright);
+  box-shadow:0 0 0 2.5px var(--gold-bright),0 0 30px rgba(255,220,0,.85),inset 0 0 18px rgba(255,200,0,.25);
+}
+.cell.winning{animation:winPop .48s cubic-bezier(.34,1.56,.64,1);z-index:10;}
+@keyframes winPop{0%{transform:scale(1)}40%{transform:scale(1.26)}72%{transform:scale(.94)}100%{transform:scale(1.1)}}
+
+/* drop in */
+.cell.drop .cell-bg,.cell.drop .cell-sym,.cell.drop .cell-glare{
+  animation:dropIn .42s cubic-bezier(.22,1.4,.6,1) both;
+}
+@keyframes dropIn{0%{transform:translateY(-65px) scale(.85);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
+
+/* pop out */
+.cell.removing .cell-bg,.cell.removing .cell-sym,.cell.removing .cell-glare{
+  animation:popOut .32s ease-in forwards;
+}
+@keyframes popOut{
+  0%{transform:scale(1.1);opacity:1;}
+  45%{transform:scale(1.55) rotate(14deg);opacity:.5;}
+  100%{transform:scale(0) rotate(25deg);opacity:0;}
+}
+
+/* scatter glow idle */
+.cell.scatter-idle .cell-bg{
+  border-color:rgba(255,180,220,.7);
+  box-shadow:0 0 18px rgba(255,100,180,.6),inset 0 0 10px rgba(255,100,180,.2);
+  animation:scatterPulse 1.6s ease-in-out infinite alternate;
+}
+@keyframes scatterPulse{
+  from{box-shadow:0 0 10px rgba(255,100,180,.4);}
+  to{box-shadow:0 0 28px rgba(255,100,180,.9),0 0 0 2px rgba(255,150,200,.6);}
+}
+
+/* ══ BOTTOM BAR ══ */
+#bottom-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,rgba(8,0,28,.88),rgba(15,4,40,.9));
+  border:2px solid rgba(255,210,80,.2);border-radius:15px;
+  padding:9px 16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 20px rgba(0,0,0,.5);
+}
+.cred-block{display:flex;flex-direction:column;gap:3px;}
+.cred-row{display:flex;gap:8px;align-items:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(11px,1.4vw,14px);}
+.cred-lbl{color:var(--gold-mid);}
+.cred-val{color:#fff;}
+
+/* win message */
+#win-msg{
+  font-size:clamp(14px,2vw,20px);color:var(--gold-bright);
+  text-shadow:0 0 16px rgba(255,220,60,.6);
+  text-align:center;min-width:180px;
+  font-family:'Nunito',sans-serif;font-weight:900;
+  transition:color .3s;letter-spacing:.5px;
+}
+#win-msg.big{animation:bigPulse .65s ease-in-out infinite alternate;color:#fff;}
+@keyframes bigPulse{
+  from{text-shadow:0 0 16px rgba(255,220,60,.7);transform:scale(1);}
+  to{text-shadow:0 0 40px #ffd700,0 0 80px rgba(255,165,0,.7);transform:scale(1.07);}
+}
+
+/* spin controls */
+.spin-area{display:flex;align-items:center;gap:10px;}
+.adj-wrap{display:flex;flex-direction:column;gap:5px;align-items:center;}
+.bet-label{font-size:9px;color:rgba(255,255,255,.4);font-family:'Nunito',sans-serif;font-weight:800;}
+
+.adj-btn{
+  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 40% 35%,#666,#2a2a2a);
+  border:2px solid rgba(255,255,255,.18);color:#fff;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .14s;box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.18);
+  font-family:'Lilita One',cursive;
+}
+.adj-btn:hover{background:radial-gradient(circle at 40% 35%,#888,#444);transform:scale(1.1);}
+
+/* spin button — the big one */
+#spin-btn{
+  width:clamp(58px,7vw,70px);height:clamp(58px,7vw,70px);
+  border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 38% 32%,#ccc 0%,#888 40%,#444 100%);
+  border:4px solid #aaa;color:#fff;font-size:28px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;
+  box-shadow:0 6px 22px rgba(0,0,0,.65),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.3);
+  font-family:'Lilita One',cursive;
+}
+#spin-btn:hover:not(:disabled){transform:scale(1.1);box-shadow:0 9px 30px rgba(0,0,0,.8);}
+#spin-btn:active:not(:disabled){transform:scale(.96);}
+#spin-btn:disabled{opacity:.4;cursor:not-allowed;}
+#spin-btn.spinning{animation:spinRot .55s linear infinite;}
+@keyframes spinRot{to{transform:rotate(360deg)}}
+
+#auto-btn{
+  background:rgba(0,0,0,.38);border:2px solid rgba(255,255,255,.18);
+  border-radius:20px;color:rgba(255,255,255,.75);padding:5px 11px;font-size:10.5px;
+  cursor:pointer;font-family:'Nunito',sans-serif;font-weight:900;
+  transition:all .15s;letter-spacing:.5px;
+}
+#auto-btn:hover,#auto-btn.on{border-color:var(--gold-mid);color:var(--gold-bright);}
+
+/* ═══════════════════════════════════════════════
+   WIN OVERLAY
+═══════════════════════════════════════════════ */
+#win-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(6px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+}
+#win-overlay.show{display:flex;}
+#ov-rays{
+  position:absolute;inset:0;pointer-events:none;
+  background:conic-gradient(from 0deg at 50% 48%,
+    transparent 0deg, rgba(255,200,0,.06) 10deg, transparent 20deg,
+    transparent 30deg, rgba(255,200,0,.06) 40deg, transparent 50deg,
+    transparent 60deg, rgba(255,200,0,.06) 70deg, transparent 80deg,
+    transparent 90deg, rgba(255,200,0,.06) 100deg, transparent 110deg,
+    transparent 120deg, rgba(255,200,0,.06) 130deg, transparent 140deg,
+    transparent 150deg, rgba(255,200,0,.06) 160deg, transparent 170deg,
+    transparent 180deg, rgba(255,200,0,.06) 190deg, transparent 200deg,
+    transparent 210deg, rgba(255,200,0,.06) 220deg, transparent 230deg,
+    transparent 240deg, rgba(255,200,0,.06) 250deg, transparent 260deg,
+    transparent 270deg, rgba(255,200,0,.06) 280deg, transparent 290deg,
+    transparent 300deg, rgba(255,200,0,.06) 310deg, transparent 320deg,
+    transparent 330deg, rgba(255,200,0,.06) 340deg, transparent 350deg
+  );
+  animation:rayRotate 8s linear infinite;
+}
+@keyframes rayRotate{to{transform:rotate(360deg)}}
+#ov-type{
+  font-size:clamp(16px,4vw,28px);color:var(--gold-bright);
+  font-family:'Nunito',sans-serif;font-weight:900;
+  letter-spacing:4px;text-transform:uppercase;
+  text-shadow:0 2px 0 var(--gold-dark);opacity:.8;
+}
+#ov-title{
+  font-size:clamp(50px,10vw,100px);color:#fff;
+  text-shadow:0 0 40px #ffd700,0 0 80px rgba(255,160,0,.7),0 6px 0 var(--gold-dark),0 12px 0 rgba(0,0,0,.4);
+  -webkit-text-stroke:2px var(--gold-mid);
+  animation:ovPop .55s cubic-bezier(.34,1.56,.64,1);
+  line-height:1;text-align:center;
+}
+#ov-amount{
+  font-size:clamp(28px,5vw,54px);color:var(--gold-bright);
+  text-shadow:0 0 30px rgba(255,220,0,.8),0 4px 0 var(--gold-dark);
+  animation:countUp .8s ease-out;font-family:'Nunito',sans-serif;font-weight:900;
+}
+@keyframes ovPop{0%{transform:scale(.15) rotate(-6deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes countUp{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+#ov-collect{
+  background:linear-gradient(160deg,#ff6eb5,#cc006a,#8a003e);
+  border:3px solid #ff9dd4;border-radius:34px;padding:13px 44px;
+  color:#fff;font-size:clamp(18px,2.5vw,24px);
+  cursor:pointer;font-family:'Lilita One',cursive;
+  box-shadow:0 6px 28px rgba(200,0,100,.6),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:all .18s;letter-spacing:1px;
+}
+#ov-collect:hover{transform:scale(1.06);box-shadow:0 9px 36px rgba(200,0,100,.8);}
+
+/* ═══════════════════════════════════════════════
+   PARTICLES
+═══════════════════════════════════════════════ */
+#particle-canvas{position:fixed;inset:0;z-index:400;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<!-- Background candy-land scene -->
+<canvas id="bg-canvas"></canvas>
+<!-- Particle effects -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- Win Overlay -->
+<div id="win-overlay">
+  <div id="ov-rays"></div>
+  <div id="ov-type">BIG WIN</div>
+  <div id="ov-title" id="ov-title">🍭</div>
+  <div id="ov-amount">$0.00</div>
+  <button id="ov-collect" onclick="closeOverlay()">COLLECT!</button>
+</div>
+
+<div id="game-shell">
+  <div id="brand-bar">
+    <div id="game-logo">SWEET TEA <span>1000</span></div>
+  </div>
+
+  <div id="stage">
+    <!-- LEFT PANEL -->
+    <div id="left-panel">
+      <div class="buy-card pink" onclick="buyFS(false)">
+        <div class="bc-label">BUY FREE SPINS</div>
+        <div class="bc-price" id="buy-fs-price">$200.00</div>
+      </div>
+      <div class="buy-card orange" onclick="buyFS(true)">
+        <div class="bc-label">BUY</div>
+        <span class="bc-super">SUPER</span>
+        <div class="bc-label">FREE SPINS</div>
+        <div class="bc-price" id="buy-super-price">$1,000.00</div>
+      </div>
+      <div id="bet-panel">
+        <div class="bp-label">BET</div>
+        <div class="bp-amount" id="bet-display">$2.00</div>
+        <div class="bp-sub">DOUBLE CHANCE<br>TO WIN FEATURE</div>
+        <div id="double-btn" onclick="toggleDouble()">
+          <div class="db-dot"></div><span>OFF</span>
+        </div>
+      </div>
+      <div id="mult-box">
+        <div class="mb-label">TOTAL MULTIPLIER</div>
+        <div id="mult-val">×1</div>
+      </div>
+      <div id="paytable"></div>
+      <div id="rtp-line">RTP: 96.53%</div>
+    </div>
+
+    <!-- MAIN GAME -->
+    <div id="main-game">
+      <div id="pays-banner">⭐ SYMBOLS PAY ANYWHERE ON THE SCREEN ⭐</div>
+      <div id="fs-bar">🍭 FREE SPINS: <span id="fs-count">0</span> remaining</div>
+      <div id="reel-wrap">
+        <div id="reel-inner">
+          <div id="grid"></div>
+        </div>
+      </div>
+      <div id="bottom-bar">
+        <div class="cred-block">
+          <div class="cred-row"><span class="cred-lbl">CREDIT</span><span class="cred-val" id="credit-el">$99,998.00</span></div>
+          <div class="cred-row"><span class="cred-lbl">BET</span><span class="cred-val" id="bet-small">$2.00</span></div>
+        </div>
+        <div id="win-msg">PLACE YOUR BETS!</div>
+        <div class="spin-area">
+          <div class="adj-wrap">
+            <div class="bet-label">BET</div>
+            <button class="adj-btn" onclick="chgBet(-1)">−</button>
+          </div>
+          <button id="spin-btn" onclick="spin()">↻</button>
+          <div class="adj-wrap">
+            <div class="bet-label">BET</div>
+            <button class="adj-btn" onclick="chgBet(1)">+</button>
+          </div>
+          <button id="auto-btn" onclick="toggleAuto()">AUTO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  BACKGROUND CANVAS — candy-land sky with clouds & ground
+// ═══════════════════════════════════════════════════════════════════
+(function(){
+  const cv=document.getElementById('bg-canvas');
+  const cx=cv.getContext('2d');
+  let W,H,clouds=[];
+
+  function resize(){
+    W=cv.width=innerWidth; H=cv.height=innerHeight;
+    clouds=[];
+    for(let i=0;i<9;i++) clouds.push({
+      x:Math.random()*W, y:60+Math.random()*H*.28,
+      r:40+Math.random()*70, s:.3+Math.random()*.5,
+      alpha:.12+Math.random()*.18
+    });
+  }
+  resize(); window.addEventListener('resize',resize);
+
+  function drawCloud(x,y,r,alpha){
+    cx.save();cx.globalAlpha=alpha;
+    const g=cx.createRadialGradient(x,y,0,x,y,r*1.4);
+    g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(1,'rgba(255,240,255,0)');
+    cx.fillStyle=g;
+    cx.beginPath();cx.arc(x,y,r,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.arc(x+r*.55,y+r*.15,r*.72,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.arc(x-r*.5,y+r*.2,r*.68,0,Math.PI*2);cx.fill();
+    cx.restore();
+  }
+
+  let t=0;
+  function draw(){
+    t+=.004;
+    // sky gradient
+    const sky=cx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,'#6ac8ff');
+    sky.addColorStop(.45,'#c0e8ff');
+    sky.addColorStop(.7,'#ffd6f0');
+    sky.addColorStop(1,'#cc88dd');
+    cx.fillStyle=sky; cx.fillRect(0,0,W,H);
+
+    // sun glow
+    const sun=cx.createRadialGradient(W*.82,H*.08,0,W*.82,H*.08,200);
+    sun.addColorStop(0,'rgba(255,255,200,.65)');sun.addColorStop(1,'rgba(255,220,100,0)');
+    cx.fillStyle=sun;cx.fillRect(0,0,W,H);
+
+    // clouds
+    clouds.forEach(c=>{
+      c.x-=c.s; if(c.x<-200) c.x=W+200;
+      drawCloud(c.x,c.y,c.r,c.alpha);
+    });
+
+    // candy-land ground stripe
+    const gnd=cx.createLinearGradient(0,H*.78,0,H);
+    gnd.addColorStop(0,'rgba(200,80,220,.55)');
+    gnd.addColorStop(1,'rgba(140,30,180,.7)');
+    cx.fillStyle=gnd;
+    cx.fillRect(0,H*.78,W,H);
+
+    // pink candy swirl hills
+    for(let i=0;i<4;i++){
+      const hx=W*(i*.28-.05)+Math.sin(t+i)*30;
+      const hy=H*.82+Math.cos(t*.7+i)*12;
+      const hr=90+i*35;
+      const hill=cx.createRadialGradient(hx,hy+hr*.4,0,hx,hy+hr*.4,hr);
+      hill.addColorStop(0,'rgba(255,140,220,.55)');hill.addColorStop(1,'rgba(255,80,180,0)');
+      cx.fillStyle=hill;cx.beginPath();cx.arc(hx,hy+hr*.4,hr,0,Math.PI*2);cx.fill();
+    }
+
+    // candy canes (static decor)
+    drawCandyCane(cx,W*.04,H*.72,H*.22);
+    drawCandyCane(cx,W*.96,H*.70,H*.25);
+
+    requestAnimationFrame(draw);
+  }
+
+  function drawCandyCane(cx,x,y,h){
+    const w=h*.09;
+    cx.save();cx.lineWidth=w;cx.lineCap='round';
+    // stripe pattern
+    const segs=6;
+    for(let i=0;i<segs;i++){
+      cx.strokeStyle=i%2===0?'rgba(255,255,255,.6)':'rgba(255,60,80,.55)';
+      cx.beginPath();cx.moveTo(x,y-h*(i/segs));cx.lineTo(x,y-h*((i+1)/segs));cx.stroke();
+    }
+    // hook
+    cx.strokeStyle='rgba(255,255,255,.5)';
+    cx.beginPath();cx.arc(x-h*.06,y-h+h*.06,h*.06,Math.PI,0,true);cx.stroke();
+    cx.restore();
+  }
+
+  draw();
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+//  PARTICLE CANVAS
+// ═══════════════════════════════════════════════════════════════════
+const partCv=document.getElementById('particle-canvas');
+const partCx=partCv.getContext('2d');
+partCv.width=innerWidth; partCv.height=innerHeight;
+window.addEventListener('resize',()=>{partCv.width=innerWidth;partCv.height=innerHeight;});
+let particles=[];
+function spawnParticles(x,y,count=18,colors=['#ffd700','#ff4da6','#00e5ff','#7fff00','#ff8c00']){
+  for(let i=0;i<count;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=3+Math.random()*6;
+    particles.push({
+      x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-3,
+      r:4+Math.random()*6,alpha:1,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      rot:Math.random()*360,vrot:(Math.random()-.5)*12
+    });
+  }
+}
+(function animPart(){
+  partCx.clearRect(0,0,partCv.width,partCv.height);
+  particles=particles.filter(p=>p.alpha>0.02);
+  for(const p of particles){
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.22; p.alpha-=.018; p.rot+=p.vrot;
+    partCx.save();partCx.globalAlpha=p.alpha;
+    partCx.translate(p.x,p.y);partCx.rotate(p.rot*Math.PI/180);
+    partCx.fillStyle=p.color;
+    partCx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);
+    partCx.restore();
+  }
+  requestAnimationFrame(animPart);
+})();
+
+function burstConfetti(){
+  const cx2=partCv.width/2, cy2=partCv.height/2;
+  for(let i=0;i<5;i++) setTimeout(()=>{
+    spawnParticles(cx2+Math.random()*200-100, cy2+Math.random()*100-50, 30);
+  },i*180);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SVG SYMBOL LIBRARY — rich multi-layer illustrations
+// ═══════════════════════════════════════════════════════════════════
+const SYMS={
+
+  /* ── GRAPES ─────────────────────────────────────── */
+  GRAPE:`<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="gB" cx="32%" cy="26%">
+      <stop offset="0%" stop-color="#f0c0ff"/>
+      <stop offset="30%" stop-color="#b030f8"/>
+      <stop offset="70%" stop-color="#7000cc"/>
+      <stop offset="100%" stop-color="#2e0050"/>
+    </radialGradient>
+    <radialGradient id="gH" cx="28%" cy="22%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.92)"/>
+      <stop offset="40%" stop-color="rgba(255,255,255,.3)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="gEdge" cx="70%" cy="75%">
+      <stop offset="0%" stop-color="rgba(180,0,255,.25)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="gDrop" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="2.5" flood-color="rgba(40,0,80,.7)"/>
+    </filter>
+    <filter id="gSoft">
+      <feGaussianBlur stdDeviation="1.2"/>
+    </filter>
+  </defs>
+  <!-- stem -->
+  <path d="M50 11 Q64 2 72 7" stroke="#2a5a08" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <line x1="50" y1="11" x2="50" y2="25" stroke="#2a5a08" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- leaf with veins -->
+  <path d="M50 17 Q66 5 76 17 Q66 29 50 17Z" fill="#46b030"/>
+  <path d="M50 17 Q64 10 76 17" stroke="#2d8820" stroke-width="1.2" fill="none"/>
+  <path d="M63 11 Q66 17 62 23" stroke="#2d8820" stroke-width=".8" fill="none"/>
+  <!-- grape shadows (painted first, behind) -->
+  <circle cx="27" cy="92" r="16" fill="rgba(0,0,0,.18)" filter="url(#gSoft)" transform="translate(2,4)"/>
+  <circle cx="50" cy="92" r="16" fill="rgba(0,0,0,.18)" filter="url(#gSoft)" transform="translate(2,4)"/>
+  <circle cx="73" cy="92" r="16" fill="rgba(0,0,0,.18)" filter="url(#gSoft)" transform="translate(2,4)"/>
+  <circle cx="37" cy="70" r="16" fill="rgba(0,0,0,.18)" filter="url(#gSoft)" transform="translate(2,4)"/>
+  <circle cx="63" cy="70" r="16" fill="rgba(0,0,0,.18)" filter="url(#gSoft)" transform="translate(2,4)"/>
+  <circle cx="50" cy="48" r="16" fill="rgba(0,0,0,.18)" filter="url(#gSoft)" transform="translate(2,4)"/>
+  <!-- grape bodies row3 -->
+  <circle cx="27" cy="92" r="16" fill="url(#gB)"/>
+  <ellipse cx="20" cy="84" rx="7" ry="5" fill="url(#gH)"/>
+  <ellipse cx="31" cy="97" rx="5" ry="3" fill="url(#gEdge)"/>
+  <circle cx="50" cy="92" r="16" fill="url(#gB)"/>
+  <ellipse cx="43" cy="84" rx="7" ry="5" fill="url(#gH)"/>
+  <ellipse cx="54" cy="97" rx="5" ry="3" fill="url(#gEdge)"/>
+  <circle cx="73" cy="92" r="16" fill="url(#gB)"/>
+  <ellipse cx="66" cy="84" rx="7" ry="5" fill="url(#gH)"/>
+  <ellipse cx="77" cy="97" rx="5" ry="3" fill="url(#gEdge)"/>
+  <!-- row2 -->
+  <circle cx="37" cy="70" r="16" fill="url(#gB)"/>
+  <ellipse cx="30" cy="62" rx="7" ry="5" fill="url(#gH)"/>
+  <ellipse cx="41" cy="75" rx="5" ry="3" fill="url(#gEdge)"/>
+  <circle cx="63" cy="70" r="16" fill="url(#gB)"/>
+  <ellipse cx="56" cy="62" rx="7" ry="5" fill="url(#gH)"/>
+  <ellipse cx="67" cy="75" rx="5" ry="3" fill="url(#gEdge)"/>
+  <!-- row1 -->
+  <circle cx="50" cy="48" r="16" fill="url(#gB)"/>
+  <ellipse cx="43" cy="40" rx="7" ry="5" fill="url(#gH)"/>
+  <ellipse cx="54" cy="53" rx="5" ry="3" fill="url(#gEdge)"/>
+  </svg>`,
+
+  /* ── WATERMELON ─────────────────────────────────── */
+  WATERMELON:`<svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- flesh gradient: bright pink centre → deep red edge -->
+    <radialGradient id="wFlesh" cx="50%" cy="42%">
+      <stop offset="0%"  stop-color="#ff9eb5"/>
+      <stop offset="28%" stop-color="#f51c38"/>
+      <stop offset="68%" stop-color="#c00020"/>
+      <stop offset="100%" stop-color="#7a0010"/>
+    </radialGradient>
+    <!-- white rind -->
+    <radialGradient id="wWhite" cx="50%" cy="42%">
+      <stop offset="0%" stop-color="#eaffd8"/>
+      <stop offset="100%" stop-color="#c8f0b0"/>
+    </radialGradient>
+    <!-- outer green rind -->
+    <radialGradient id="wRind" cx="50%" cy="30%">
+      <stop offset="0%"  stop-color="#a0f060"/>
+      <stop offset="40%" stop-color="#30b820"/>
+      <stop offset="80%" stop-color="#168010"/>
+      <stop offset="100%" stop-color="#0a4808"/>
+    </radialGradient>
+    <!-- dark green stripes on rind -->
+    <radialGradient id="wStripe" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="rgba(0,60,0,.55)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <!-- flesh shine large blob -->
+    <radialGradient id="wShine1" cx="38%" cy="32%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.72)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,.18)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <!-- secondary smaller shine -->
+    <radialGradient id="wShine2" cx="68%" cy="55%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.38)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <!-- rind top gloss -->
+    <radialGradient id="wRindShine" cx="50%" cy="20%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.45)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <!-- seed shine -->
+    <radialGradient id="wSeedShine" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.55)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="wDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="rgba(0,0,0,.55)"/>
+    </filter>
+    <filter id="wGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="wClip">
+      <path d="M5 80 A52 52 0 0 1 105 80Z"/>
+    </clipPath>
+  </defs>
+
+  <g filter="url(#wDrop)">
+    <!-- ── RIND outer dark green ── -->
+    <path d="M5 80 A52 52 0 0 1 105 80Z" fill="url(#wRind)"/>
+    <!-- rind dark stripes -->
+    <ellipse cx="28" cy="58" rx="6" ry="26" fill="url(#wStripe)" transform="rotate(-28,28,58)" clip-path="url(#wClip)"/>
+    <ellipse cx="50" cy="52" rx="5" ry="28" fill="url(#wStripe)" clip-path="url(#wClip)"/>
+    <ellipse cx="72" cy="58" rx="6" ry="26" fill="url(#wStripe)" transform="rotate(28,72,58)" clip-path="url(#wClip)"/>
+    <!-- rind top gloss arc -->
+    <path d="M12 80 A46 46 0 0 1 98 80Z" fill="url(#wRindShine)" opacity=".6"/>
+
+    <!-- ── WHITE RIND RING ── -->
+    <path d="M13 80 A44 44 0 0 1 97 80Z" fill="url(#wWhite)"/>
+
+    <!-- ── RED FLESH ── -->
+    <path d="M20 80 A37 37 0 0 1 90 80Z" fill="url(#wFlesh)"/>
+
+    <!-- ── SEEDS (teardrop shaped, with gloss) ── -->
+    <!-- left cluster -->
+    <ellipse cx="31" cy="70" rx="3.2" ry="5.4" fill="#111" transform="rotate(-18,31,70)"/>
+    <ellipse cx="30" cy="68" rx="1.2" ry="1.8" fill="url(#wSeedShine)" transform="rotate(-18,30,68)"/>
+    <ellipse cx="43" cy="66" rx="3.2" ry="5.4" fill="#111" transform="rotate(-8,43,66)"/>
+    <ellipse cx="42" cy="64" rx="1.2" ry="1.8" fill="url(#wSeedShine)" transform="rotate(-8,42,64)"/>
+    <!-- centre -->
+    <ellipse cx="55" cy="63" rx="3.2" ry="5.4" fill="#111"/>
+    <ellipse cx="54" cy="61" rx="1.2" ry="1.8" fill="url(#wSeedShine)"/>
+    <!-- right cluster -->
+    <ellipse cx="67" cy="66" rx="3.2" ry="5.4" fill="#111" transform="rotate(8,67,66)"/>
+    <ellipse cx="66" cy="64" rx="1.2" ry="1.8" fill="url(#wSeedShine)" transform="rotate(8,66,64)"/>
+    <ellipse cx="79" cy="70" rx="3.2" ry="5.4" fill="#111" transform="rotate(18,79,70)"/>
+    <ellipse cx="78" cy="68" rx="1.2" ry="1.8" fill="url(#wSeedShine)" transform="rotate(18,78,68)"/>
+    <!-- lower seeds -->
+    <ellipse cx="37" cy="76" rx="2.8" ry="4.6" fill="#111" transform="rotate(-10,37,76)"/>
+    <ellipse cx="36.5" cy="74.5" rx="1" ry="1.5" fill="url(#wSeedShine)" transform="rotate(-10,36.5,74.5)"/>
+    <ellipse cx="63" cy="76" rx="2.8" ry="4.6" fill="#111" transform="rotate(10,63,76)"/>
+    <ellipse cx="62.5" cy="74.5" rx="1" ry="1.5" fill="url(#wSeedShine)" transform="rotate(10,62.5,74.5)"/>
+
+    <!-- ── FLESH SHINE gloss blobs ── -->
+    <ellipse cx="38" cy="62" rx="18" ry="9" fill="url(#wShine1)" transform="rotate(-26,38,62)"/>
+    <ellipse cx="74" cy="70" rx="9" ry="5" fill="url(#wShine2)"/>
+
+    <!-- ── CUT EDGE highlight line ── -->
+    <path d="M20 80 A37 37 0 0 1 90 80" stroke="rgba(255,200,200,.35)" stroke-width="1.5" fill="none"/>
+  </g>
+  </svg>`,
+
+  /* ── BANANA ─ horizontal orientation ────────────── */
+  BANANA:`<svg viewBox="0 0 110 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#fffde8"/>
+      <stop offset="20%" stop-color="#ffe800"/>
+      <stop offset="65%" stop-color="#f5b800"/>
+      <stop offset="100%" stop-color="#b05800"/>
+    </linearGradient>
+    <linearGradient id="bEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a05000"/>
+      <stop offset="100%" stop-color="#7a3800"/>
+    </linearGradient>
+    <radialGradient id="bShine1" cx="30%" cy="28%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.72)"/>
+      <stop offset="55%" stop-color="rgba(255,255,255,.18)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="bShine2" cx="70%" cy="60%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.35)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="bDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="rgba(80,30,0,.65)"/>
+    </filter>
+  </defs>
+  <g filter="url(#bDrop)">
+    <!-- banana body: curves left-to-right with upward arc -->
+    <path d="
+      M18 62
+      Q10 38  28 22
+      Q52  6  82 14
+      Q100 18 100 30
+      Q92  26  78 28
+      Q52  24  34 36
+      Q16  48  20 68
+      Z
+    " fill="url(#bSkin)" stroke="#8a4800" stroke-width="1.6"/>
+    <!-- left tip (dark nub) -->
+    <ellipse cx="18" cy="63" rx="6" ry="5.5" fill="#3a1a08" transform="rotate(20,18,63)"/>
+    <!-- right tip subtle dark -->
+    <ellipse cx="100" cy="29" rx="5" ry="4" fill="#6a3000" transform="rotate(-15,100,29)"/>
+    <!-- top ridge highlight stripe 1 -->
+    <path d="M34 24 Q58 14  80 20" stroke="rgba(255,255,255,.7)" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+    <!-- stripe 2 -->
+    <path d="M30 34 Q54 22  78 27" stroke="rgba(255,255,255,.38)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- inner shadow on belly -->
+    <path d="M20 65 Q22 46  42 36" stroke="rgba(140,55,0,.3)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <!-- wide shine blob top-left -->
+    <ellipse cx="40" cy="28" rx="20" ry="9" fill="url(#bShine1)" transform="rotate(-22,40,28)"/>
+    <!-- smaller shine right -->
+    <ellipse cx="80" cy="36" rx="10" ry="5" fill="url(#bShine2)"/>
+  </g>
+  </svg>`,
+
+  /* ── APPLE ──────────────────────────────────────── */
+  APPLE:`<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="aBase" cx="38%" cy="26%">
+      <stop offset="0%"  stop-color="#ffb8b8"/>
+      <stop offset="35%" stop-color="#e80808"/>
+      <stop offset="75%" stop-color="#b80000"/>
+      <stop offset="100%" stop-color="#600000"/>
+    </radialGradient>
+    <radialGradient id="aShine" cx="28%" cy="20%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.9)"/>
+      <stop offset="45%" stop-color="rgba(255,255,255,.25)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="aGlow" cx="65%" cy="80%">
+      <stop offset="0%" stop-color="rgba(255,150,150,.3)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="aDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4.5" flood-color="rgba(80,0,0,.6)"/>
+    </filter>
+  </defs>
+  <g filter="url(#aDrop)">
+    <!-- stem -->
+    <path d="M50 18 Q57 7 67 11" stroke="#2e1408" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <!-- leaf -->
+    <path d="M53 15 Q69 4 76 15 Q68 28 53 15Z" fill="#44b830"/>
+    <path d="M53 15 Q66 9  76 15" stroke="#2a8018" stroke-width="1.2" fill="none"/>
+    <path d="M65 8 Q68 15 64 22" stroke="#2a8018" stroke-width=".9" fill="none"/>
+    <!-- body -->
+    <path d="M50 28 C20 28 10 48 12 70 C14 92 28 104 44 105 C47.5 105.5 50 104 50 104 C50 104 52.5 105.5 56 105 C72 104 86 92 88 70 C90 48 80 28 50 28Z" fill="url(#aBase)"/>
+    <!-- indent dip -->
+    <path d="M44 30 Q50 26 56 30" stroke="rgba(70,0,0,.5)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- main shine -->
+    <ellipse cx="34" cy="52" rx="17" ry="23" fill="url(#aShine)"/>
+    <!-- secondary small specular -->
+    <ellipse cx="28" cy="42" rx="6" ry="4" fill="rgba(255,255,255,.55)" transform="rotate(-20,28,42)"/>
+    <!-- bottom ambient bounce -->
+    <ellipse cx="64" cy="90" rx="14" ry="8" fill="url(#aGlow)"/>
+  </g>
+  </svg>`,
+
+  /* ── PEACH ──────────────────────────────────────── */
+  PEACH:`<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="pBase" cx="40%" cy="28%">
+      <stop offset="0%"  stop-color="#fff0d0"/>
+      <stop offset="30%" stop-color="#ffaa20"/>
+      <stop offset="70%" stop-color="#e07000"/>
+      <stop offset="100%" stop-color="#b04400"/>
+    </radialGradient>
+    <radialGradient id="pBlush" cx="72%" cy="62%">
+      <stop offset="0%" stop-color="rgba(255,90,30,.3)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="pShine" cx="28%" cy="20%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.88)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,.22)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="pGlow" cx="50%" cy="90%">
+      <stop offset="0%" stop-color="rgba(255,160,80,.22)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="pDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4.5" flood-color="rgba(100,30,0,.6)"/>
+    </filter>
+  </defs>
+  <g filter="url(#pDrop)">
+    <!-- stem -->
+    <path d="M50 13 Q58 3 68 7" stroke="#2e1408" stroke-width="4.2" fill="none" stroke-linecap="round"/>
+    <!-- leaf -->
+    <path d="M53 12 Q69 2 76 12 Q68 23 53 12Z" fill="#54c040"/>
+    <path d="M53 12 Q66 7 76 12" stroke="#308a20" stroke-width="1.2" fill="none"/>
+    <!-- body -->
+    <ellipse cx="50" cy="66" rx="39" ry="42" fill="url(#pBase)"/>
+    <!-- crease line -->
+    <path d="M50 28 Q44 58 50 104" stroke="rgba(160,40,0,.28)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- blush right -->
+    <ellipse cx="70" cy="72" rx="22" ry="18" fill="url(#pBlush)"/>
+    <!-- main shine -->
+    <ellipse cx="33" cy="50" rx="16" ry="21" fill="url(#pShine)"/>
+    <!-- tiny top specular -->
+    <ellipse cx="26" cy="40" rx="6" ry="4" fill="rgba(255,255,255,.55)" transform="rotate(-18,26,40)"/>
+    <!-- bottom ambient -->
+    <ellipse cx="50" cy="100" rx="20" ry="8" fill="url(#pGlow)"/>
+  </g>
+  </svg>`,
+
+  /* ── PURPLE CANDY ───────────────────────────────── */
+  PURPLE:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="puBase" cx="32%" cy="26%">
+      <stop offset="0%"  stop-color="#f4ccff"/>
+      <stop offset="35%" stop-color="#aa00f8"/>
+      <stop offset="72%" stop-color="#7000cc"/>
+      <stop offset="100%" stop-color="#2e0058"/>
+    </radialGradient>
+    <radialGradient id="puShine" cx="28%" cy="20%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.92)"/>
+      <stop offset="45%" stop-color="rgba(255,255,255,.25)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="puGlow" cx="68%" cy="78%">
+      <stop offset="0%" stop-color="rgba(200,60,255,.28)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="puDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="rgba(50,0,100,.7)"/>
+    </filter>
+  </defs>
+  <g filter="url(#puDrop)">
+    <!-- outer soft glow -->
+    <rect x="7" y="7" width="86" height="86" rx="23" ry="23" fill="rgba(160,0,255,.14)"/>
+    <!-- body -->
+    <rect x="10" y="10" width="80" height="80" rx="21" ry="21" fill="url(#puBase)" stroke="rgba(240,180,255,.3)" stroke-width="2"/>
+    <!-- inner bevel plate -->
+    <rect x="16" y="16" width="68" height="34" rx="14" ry="14" fill="rgba(255,255,255,.1)"/>
+    <!-- edge rim highlight -->
+    <rect x="10" y="10" width="80" height="80" rx="21" ry="21" fill="none" stroke="rgba(255,220,255,.18)" stroke-width="3"/>
+    <!-- main shine -->
+    <ellipse cx="35" cy="35" rx="22" ry="15" fill="url(#puShine)" transform="rotate(-26,35,35)"/>
+    <!-- small hot-spot -->
+    <ellipse cx="23" cy="26" rx="7" ry="4.5" fill="rgba(255,255,255,.6)" transform="rotate(-20,23,26)"/>
+    <!-- bottom glow -->
+    <ellipse cx="66" cy="78" rx="18" ry="9" fill="url(#puGlow)"/>
+  </g>
+  </svg>`,
+
+  /* ── BLUE CANDY ─────────────────────────────────── */
+  BLUE:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="blBase" cx="32%" cy="26%">
+      <stop offset="0%"  stop-color="#c8f0ff"/>
+      <stop offset="35%" stop-color="#0080f8"/>
+      <stop offset="72%" stop-color="#0040d0"/>
+      <stop offset="100%" stop-color="#001270"/>
+    </radialGradient>
+    <radialGradient id="blShine" cx="28%" cy="20%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.94)"/>
+      <stop offset="45%" stop-color="rgba(255,255,255,.25)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="blGlow" cx="68%" cy="78%">
+      <stop offset="0%" stop-color="rgba(60,160,255,.3)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="blDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="rgba(0,20,100,.75)"/>
+    </filter>
+  </defs>
+  <g filter="url(#blDrop)">
+    <!-- outer soft glow -->
+    <circle cx="50" cy="50" r="44" fill="rgba(0,80,255,.14)"/>
+    <!-- body -->
+    <circle cx="50" cy="50" r="41" fill="url(#blBase)" stroke="rgba(180,240,255,.3)" stroke-width="2"/>
+    <!-- inner highlight dome -->
+    <ellipse cx="50" cy="36" rx="30" ry="16" fill="rgba(255,255,255,.1)"/>
+    <!-- rim highlight -->
+    <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(200,240,255,.2)" stroke-width="3"/>
+    <!-- main shine -->
+    <ellipse cx="34" cy="34" rx="20" ry="13" fill="url(#blShine)" transform="rotate(-30,34,34)"/>
+    <!-- small hot-spot -->
+    <ellipse cx="22" cy="26" rx="7" ry="4.5" fill="rgba(255,255,255,.62)" transform="rotate(-22,22,26)"/>
+    <!-- bottom glow -->
+    <ellipse cx="66" cy="70" rx="18" ry="9" fill="url(#blGlow)"/>
+  </g>
+  </svg>`,
+
+  /* ── HEART CANDY ────────────────────────────────── */
+  HEART:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="hBase" cx="38%" cy="24%">
+      <stop offset="0%"  stop-color="#ffcccc"/>
+      <stop offset="30%" stop-color="#f00018"/>
+      <stop offset="68%" stop-color="#b80010"/>
+      <stop offset="100%" stop-color="#580006"/>
+    </radialGradient>
+    <radialGradient id="hShine" cx="28%" cy="18%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.92)"/>
+      <stop offset="45%" stop-color="rgba(255,255,255,.25)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="hGlow" cx="65%" cy="78%">
+      <stop offset="0%" stop-color="rgba(255,100,100,.28)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="hDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="rgba(100,0,10,.65)"/>
+    </filter>
+  </defs>
+  <g filter="url(#hDrop)">
+    <!-- shadow shape behind -->
+    <path d="M50 90 C50 90 8 58 8 34 C8 17 20 9 32 11 C40 12 47 20 50 25 C53 20 60 12 68 11 C80 9 92 17 92 34 C92 58 50 90 50 90Z" fill="rgba(0,0,0,.15)" transform="translate(3,5)"/>
+    <!-- body -->
+    <path d="M50 90 C50 90 8 58 8 34 C8 17 20 9 32 11 C40 12 47 20 50 25 C53 20 60 12 68 11 C80 9 92 17 92 34 C92 58 50 90 50 90Z" fill="url(#hBase)" stroke="rgba(255,180,180,.12)" stroke-width="1"/>
+    <!-- left lobe crease -->
+    <path d="M35 18 Q32 30 38 42" stroke="rgba(80,0,0,.2)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- right lobe crease -->
+    <path d="M65 18 Q68 30 62 42" stroke="rgba(80,0,0,.2)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- main shine -->
+    <ellipse cx="32" cy="32" rx="15" ry="19" fill="url(#hShine)" transform="rotate(-20,32,32)"/>
+    <!-- small hot-spot -->
+    <ellipse cx="23" cy="24" rx="6" ry="4" fill="rgba(255,255,255,.65)" transform="rotate(-18,23,24)"/>
+    <!-- bottom ambient -->
+    <ellipse cx="65" cy="72" rx="14" ry="8" fill="url(#hGlow)"/>
+  </g>
+  </svg>`,
+
+  /* ── LOLLIPOP (SCATTER) ─────────────────────────── */
+  LOLLIPOP:`<svg viewBox="0 0 100 114" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="lpBase" cx="42%" cy="34%">
+      <stop offset="0%"  stop-color="#fff5f5"/>
+      <stop offset="22%" stop-color="#ff77aa"/>
+      <stop offset="55%" stop-color="#cc0044"/>
+      <stop offset="100%" stop-color="#500015"/>
+    </radialGradient>
+    <radialGradient id="lpShine" cx="28%" cy="22%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.96)"/>
+      <stop offset="45%" stop-color="rgba(255,255,255,.25)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="lpGlow" cx="50%" cy="50%">
+      <stop offset="60%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="rgba(255,60,120,.18)"/>
+    </radialGradient>
+    <linearGradient id="lpStick" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"  stop-color="#c8a800"/>
+      <stop offset="40%" stop-color="#fff0a0"/>
+      <stop offset="70%" stop-color="#e8c000"/>
+      <stop offset="100%" stop-color="#a07800"/>
+    </linearGradient>
+    <filter id="lpDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5.5" flood-color="rgba(100,0,40,.7)"/>
+    </filter>
+  </defs>
+  <!-- stick -->
+  <rect x="46" y="78" width="9" height="36" rx="4.5" fill="url(#lpStick)"/>
+  <rect x="46" y="78" width="9" height="36" rx="4.5" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+  <g filter="url(#lpDrop)">
+    <!-- outer glow ring -->
+    <circle cx="50" cy="48" r="44" fill="url(#lpGlow)"/>
+    <!-- candy disk -->
+    <circle cx="50" cy="48" r="40" fill="url(#lpBase)"/>
+    <!-- swirl layer 1 white -->
+    <path d="M50 11 A37 37 0 1 1 13 48" stroke="rgba(255,255,255,.38)" stroke-width="13" fill="none" stroke-linecap="round"/>
+    <!-- swirl layer 2 pink -->
+    <path d="M50 19 A29 29 0 1 1 21 48" stroke="rgba(255,80,140,.46)" stroke-width="9.5" fill="none" stroke-linecap="round"/>
+    <!-- swirl layer 3 white -->
+    <path d="M50 27 A21 21 0 1 1 29 48" stroke="rgba(255,255,255,.3)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <!-- swirl layer 4 pink -->
+    <path d="M50 34 A14 14 0 1 1 36 48" stroke="rgba(255,80,140,.32)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- swirl layer 5 white centre -->
+    <path d="M50 40 A8 8 0 1 1 42 48" stroke="rgba(255,255,255,.28)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <!-- centre dot -->
+    <circle cx="50" cy="48" r="5.5" fill="rgba(255,255,255,.55)"/>
+    <!-- gold ring border -->
+    <circle cx="50" cy="48" r="40" fill="none" stroke="rgba(255,215,0,.72)" stroke-width="3"/>
+    <!-- main shine blob -->
+    <ellipse cx="33" cy="32" rx="16" ry="11" fill="url(#lpShine)" transform="rotate(-26,33,32)"/>
+    <!-- small hot-spot -->
+    <ellipse cx="24" cy="26" rx="6" ry="4" fill="rgba(255,255,255,.65)" transform="rotate(-20,24,26)"/>
+  </g>
+  </svg>`,
+};
+
+const SYM_KEYS=['GRAPE','WATERMELON','BANANA','APPLE','PEACH','PURPLE','BLUE','HEART'];
+const SCATTER='LOLLIPOP';
+const SYM_NAMES={GRAPE:'Grapes',WATERMELON:'Watermelon',BANANA:'Banana',APPLE:'Apple',PEACH:'Peach',PURPLE:'Purple Candy',BLUE:'Blue Candy',HEART:'Heart Candy',LOLLIPOP:'Lollipop'};
+
+const PAY={
+  GRAPE:      {8:.4,9:.6,10:.8,11:1,12:2,13:3,14:4,15:5},
+  WATERMELON: {8:.4,9:.6,10:.8,11:1,12:2,13:3,14:4,15:5},
+  BANANA:     {8:.5,9:.8,10:1.2,11:1.5,12:3,13:5,14:7,15:9},
+  APPLE:      {8:.6,9:.9,10:1.4,11:2,12:4,13:6,14:8,15:10},
+  PEACH:      {8:.8,9:1.2,10:2,11:3,12:8,13:12,14:15,15:18},
+  PURPLE:     {8:1,9:1.5,10:2.5,11:4,12:15,13:20,14:25,15:30},
+  BLUE:       {8:2,9:3,10:5,11:8,12:25,13:40,14:60,15:80},
+  HEART:      {8:3,9:5,10:8,11:12,12:50,13:80,14:120,15:200},
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════════════════════════
+const BETS=[0.20,0.40,0.60,0.80,1,1.25,1.50,2,2.50,3,4,5,6,8,10];
+let betIdx=7, credit=99998, isSpinning=false, isAuto=false;
+let freeSpins=0, isFSMode=false, roundWin=0, totalMult=1, doubleOn=false;
+let grid=[];
+const ROWS=5, COLS=6;
+
+// ── BUILD PAYTABLE ──
+function buildPaytable(){
+  const el=document.getElementById('paytable');
+  const order=['HEART','BLUE','PURPLE','PEACH','APPLE','BANANA','WATERMELON','GRAPE','LOLLIPOP'];
+  el.innerHTML=order.map(k=>{
+    const iconSvg=SYMS[k]?SYMS[k].replace('<svg ','<svg class="pt-icon" '):SYMS[k]||'';
+    const payStr=k===SCATTER?'BONUS TRIGGER':`8×:${PAY[k][8]}  12×:${PAY[k][12]}`;
+    return `<div class="pt-row">
+      <span class="pt-icon">${iconSvg}</span>
+      <div class="pt-data"><span class="pt-sym-name">${SYM_NAMES[k]}</span><span class="pt-pay">${payStr}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ── GRID ──
+function makeGrid(){
+  const g=[];
+  for(let r=0;r<ROWS;r++){g[r]=[];for(let c=0;c<COLS;c++) g[r][c]=randSym();}
+  return g;
+}
+function randSym(inclSc=true){
+  if(inclSc&&Math.random()<.048) return SCATTER;
+  return SYM_KEYS[Math.floor(Math.random()*SYM_KEYS.length)];
+}
+
+function makeCell(sym){
+  const div=document.createElement('div'); div.className='cell';
+  const bg=document.createElement('div'); bg.className='cell-bg'; div.appendChild(bg);
+  const symEl=document.createElement('div'); symEl.className='cell-sym';
+  if(SYMS[sym]) symEl.innerHTML=SYMS[sym];
+  else symEl.innerHTML=`<svg viewBox="0 0 100 100"><text y="65" font-size="60" text-anchor="middle" x="50">${sym}</text></svg>`;
+  div.appendChild(symEl);
+  const glare=document.createElement('div'); glare.className='cell-glare'; div.appendChild(glare);
+  if(sym===SCATTER) div.classList.add('scatter-idle');
+  return div;
+}
+
+function renderGrid(g,dropCols=null){
+  grid=g;
+  const el=document.getElementById('grid'); el.innerHTML='';
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const cell=makeCell(g[r][c]); cell.id=`c${r}${c}`;
+    if(dropCols&&dropCols.includes(c)){
+      cell.classList.add('drop');
+      const delay=(r*.055+c*.018+Math.random()*.03)+'s';
+      cell.querySelectorAll('.cell-bg,.cell-sym,.cell-glare').forEach(x=>x.style.animationDelay=delay);
+    }
+    el.appendChild(cell);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SPIN LOOP
+// ═══════════════════════════════════════════════════════════════════
+async function spin(){
+  if(isSpinning) return;
+  const bet=BETS[betIdx];
+  if(!isFSMode){ if(credit<bet){ setMsg('Not enough credits!',''); return; } credit-=bet; updateUI(); }
+  isSpinning=true;
+  document.getElementById('spin-btn').disabled=true;
+  document.getElementById('spin-btn').classList.add('spinning');
+  setMsg('🎰 Spinning…',''); roundWin=0; totalMult=1;
+  document.getElementById('mult-val').textContent='×1';
+  const ng=makeGrid();
+  await animSpin(ng); renderGrid(ng); grid=ng; await sleep(300);
+  const sc=countSym(grid,SCATTER);
+  if(sc>=4) await bonusIntro(sc);
+  else { await tumbleLoop(bet); endRound(); }
+}
+
+async function animSpin(ng){
+  // column-by-column reveal
+  for(let c=0;c<COLS;c++){
+    await sleep(68);
+    for(let r=0;r<ROWS;r++){
+      const el=document.getElementById(`c${r}${c}`);
+      if(!el) continue;
+      const nc=makeCell(ng[r][c]);
+      el.className=nc.className+' drop'; el.innerHTML=nc.innerHTML;
+      const delay=(r*.04)+'s';
+      el.querySelectorAll('.cell-bg,.cell-sym,.cell-glare').forEach(x=>x.style.animationDelay=delay);
+    }
+  }
+  await sleep(420);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TUMBLE MECHANIC
+// ═══════════════════════════════════════════════════════════════════
+async function tumbleLoop(bet){
+  while(true){
+    const wins=findWins(grid); if(!wins.length) break;
+    const wSet=new Set(); wins.forEach(w=>w.pos.forEach(p=>wSet.add(p)));
+    // highlight winners
+    wSet.forEach(p=>{
+      const [r,c]=[...p].map(Number); // 'rc' single char? use split
+    });
+    // actually parse positions
+    const positions=[...wSet].map(p=>p.split('-').map(Number));
+    positions.forEach(([r,c])=>{
+      const el=document.getElementById(`c${r}${c}`);
+      if(el){ el.classList.add('winning'); el.classList.remove('scatter-idle'); }
+    });
+    // spawn particles at grid center
+    const gridEl=document.getElementById('grid');
+    const rect=gridEl.getBoundingClientRect();
+    spawnParticles(rect.left+rect.width/2, rect.top+rect.height/2, 12);
+
+    let tw=wins.reduce((s,w)=>s+w.payout*bet,0);
+
+    // bomb multiplier in free spins
+    if(isFSMode&&Math.random()<.4){
+      const vals=[2,3,5,8,10,25,50,100,500,1000];
+      const bm=vals[Math.floor(Math.random()*vals.length)];
+      totalMult*=bm;
+      const mv=document.getElementById('mult-val');
+      mv.textContent='×'+totalMult; mv.classList.remove('bump'); void mv.offsetWidth; mv.classList.add('bump');
+      // chip on first winner
+      if(positions[0]){
+        const [r,c]=positions[0];
+        const el=document.getElementById(`c${r}${c}`);
+        if(el){ const chip=document.createElement('div');
+          chip.style.cssText='position:absolute;top:-10px;right:-10px;background:linear-gradient(135deg,#ff4da6,#9b35e0);border:2px solid #fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;z-index:20;font-family:Lilita One,cursive;box-shadow:0 3px 12px rgba(0,0,0,.6);animation:chipPop .3s cubic-bezier(.34,1.56,.64,1)';
+          chip.textContent='×'+bm; el.appendChild(chip); setTimeout(()=>chip.remove(),1700); }
+      }
+    }
+    roundWin+=tw*(isFSMode?totalMult:1);
+    await sleep(660);
+
+    // remove winners
+    positions.forEach(([r,c])=>{
+      const el=document.getElementById(`c${r}${c}`);
+      if(el){ el.classList.add('removing'); el.classList.remove('winning'); }
+      grid[r][c]=null;
+    });
+    await sleep(360);
+    await gravity();
+    setMsg(`WIN  $${roundWin.toFixed(2)}`, roundWin>=BETS[betIdx]*10?'big':'');
+    await sleep(300);
+  }
+}
+
+async function gravity(){
+  const changed=new Set();
+  for(let c=0;c<COLS;c++){
+    let col=[];
+    for(let r=0;r<ROWS;r++) if(grid[r][c]!==null) col.push(grid[r][c]);
+    while(col.length<ROWS) col.unshift(randSym(isFSMode));
+    for(let r=0;r<ROWS;r++){ if(grid[r][c]!==col[r]) changed.add(c); grid[r][c]=col[r]; }
+  }
+  renderGrid(grid,[...changed]); await sleep(430);
+}
+
+function findWins(g){
+  const cnt={},pos={};
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const s=g[r][c]; if(!s||s===SCATTER) continue;
+    cnt[s]=(cnt[s]||0)+1; if(!pos[s]) pos[s]=[]; pos[s].push(`${r}-${c}`);
+  }
+  const wins=[];
+  for(const sym of SYM_KEYS) if(cnt[sym]>=8){
+    let br=8; for(let b=8;b<=15;b++) if(cnt[sym]>=b) br=b;
+    wins.push({sym,count:cnt[sym],payout:PAY[sym][br]||PAY[sym][8],pos:pos[sym]});
+  }
+  return wins;
+}
+function countSym(g,s){ let n=0; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(g[r][c]===s) n++; return n; }
+
+// ═══════════════════════════════════════════════════════════════════
+//  BONUS / FREE SPINS
+// ═══════════════════════════════════════════════════════════════════
+async function bonusIntro(sc){
+  const extra=Math.min(sc-4,6); freeSpins=10+extra*2;
+  isFSMode=true; totalMult=1;
+  burstConfetti();
+  showOv('FREE SPINS','🍭 Free Spins! 🍭',`${freeSpins} Spins Awarded!`);
+  await sleep(2800); closeOverlay();
+  document.getElementById('fs-bar').classList.add('show');
+  document.getElementById('fs-count').textContent=freeSpins;
+  await runFS();
+}
+async function runFS(){
+  const bet=BETS[betIdx];
+  while(freeSpins>0){
+    freeSpins--; document.getElementById('fs-count').textContent=freeSpins;
+    setMsg(`🍭 Free Spin — ${freeSpins} left`,'');
+    const ng=makeGrid(); await animSpin(ng); renderGrid(ng); grid=ng; await sleep(280);
+    const sc=countSym(grid,SCATTER);
+    if(sc>=3){
+      const b=(sc-2)*5; freeSpins+=b;
+      document.getElementById('fs-count').textContent=freeSpins;
+      showOv('RETRIGGER','🎉 Retrigger! 🎉',`+${b} Free Spins!`);
+      await sleep(2000); closeOverlay();
+    }
+    await tumbleLoop(bet); await sleep(380);
+  }
+  isFSMode=false; totalMult=1;
+  document.getElementById('fs-bar').classList.remove('show');
+  document.getElementById('mult-val').textContent='×1';
+  endRound();
+}
+
+function buyFS(isSuper){
+  const bet=BETS[betIdx]; const cost=bet*(isSuper?500:100);
+  if(credit<cost){ setMsg('Not enough credits!',''); return; }
+  if(!confirm(`Buy ${isSuper?'Super ':''}Free Spins for $${cost.toFixed(2)}?`)) return;
+  credit-=cost; freeSpins=isSuper?25:10; isFSMode=true; if(isSuper) totalMult=10;
+  updateUI(); document.getElementById('fs-bar').classList.add('show');
+  document.getElementById('fs-count').textContent=freeSpins;
+  if(!isSpinning){
+    isSpinning=true; document.getElementById('spin-btn').disabled=true;
+    runFS().then(()=>{ isSpinning=false; document.getElementById('spin-btn').disabled=false; document.getElementById('spin-btn').classList.remove('spinning'); });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  END ROUND
+// ═══════════════════════════════════════════════════════════════════
+function endRound(){
+  isSpinning=false;
+  document.getElementById('spin-btn').disabled=false;
+  document.getElementById('spin-btn').classList.remove('spinning');
+  const bet=BETS[betIdx];
+  if(roundWin>0){
+    credit+=roundWin;
+    if(roundWin>=bet*30){ burstConfetti(); showOv('MEGA WIN','🍭 MEGA WIN! 🍭',`$${roundWin.toFixed(2)}`); }
+    else if(roundWin>=bet*15){ burstConfetti(); showOv('BIG WIN','🎉 BIG WIN! 🎉',`$${roundWin.toFixed(2)}`); }
+    else if(roundWin>=bet*8){ showOv('GREAT WIN','✨ Great Win! ✨',`$${roundWin.toFixed(2)}`); }
+    else setMsg(`WIN  $${roundWin.toFixed(2)}`, roundWin>=bet*5?'big':'');
+  } else setMsg('SPIN TO WIN!','');
+  updateUI();
+  if(isAuto&&!isFSMode) setTimeout(()=>{ if(isAuto&&!isFSMode) spin(); },1100);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  OVERLAY
+// ═══════════════════════════════════════════════════════════════════
+function showOv(type,title,amount){
+  document.getElementById('ov-type').textContent=type;
+  document.getElementById('ov-title').textContent=title;
+  document.getElementById('ov-amount').textContent=amount;
+  document.getElementById('win-overlay').classList.add('show');
+}
+function closeOverlay(){ document.getElementById('win-overlay').classList.remove('show'); }
+
+// ═══════════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function updateUI(){
+  const bet=BETS[betIdx];
+  ['bet-display','bet-small'].forEach(id=>document.getElementById(id).textContent='$'+bet.toFixed(2));
+  document.getElementById('credit-el').textContent='$'+credit.toFixed(2);
+  document.getElementById('buy-fs-price').textContent='$'+(bet*100).toFixed(2);
+  document.getElementById('buy-super-price').textContent='$'+(bet*500).toFixed(2);
+}
+function chgBet(d){ if(isSpinning)return; betIdx=Math.max(0,Math.min(BETS.length-1,betIdx+d)); updateUI(); }
+function toggleDouble(){
+  doubleOn=!doubleOn;
+  const btn=document.getElementById('double-btn');
+  btn.classList.toggle('on',doubleOn);
+  btn.querySelector('span').textContent=doubleOn?'ON':'OFF';
+}
+function toggleAuto(){
+  isAuto=!isAuto;
+  const btn=document.getElementById('auto-btn');
+  btn.classList.toggle('on',isAuto);
+  btn.textContent=isAuto?'⏸ STOP':'AUTO';
+  if(isAuto&&!isSpinning) spin();
+}
+function setMsg(txt,cls){
+  const el=document.getElementById('win-msg');
+  el.textContent=txt; el.className=cls?`big`:'';
+  el.id='win-msg';
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ═══════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════
+function init(){
+  buildPaytable();
+  grid=makeGrid(); renderGrid(grid); updateUI();
+}
+init();
+
+// ── VIEWPORT SCALE FIT ──────────────────────────
+function scaleGame(){
+  const shell = document.getElementById('game-shell');
+  const padV = 16; // px breathing room top+bottom
+  const padH = 16;
+  const scaleX = (window.innerWidth  - padH) / shell.scrollWidth;
+  const scaleY = (window.innerHeight - padV) / shell.scrollHeight;
+  const scale  = Math.min(scaleX, scaleY, 1); // never upscale
+  shell.style.transform = `scale(${scale})`;
+  // re-center after scale
+  const scaledH = shell.scrollHeight * scale;
+  const offsetY = Math.max(0, (window.innerHeight - scaledH) / 2);
+  shell.style.marginTop = offsetY + 'px';
+}
+scaleGame();
+window.addEventListener('resize', scaleGame);
+</script>
+</body>
+</html>
