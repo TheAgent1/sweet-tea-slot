@@ -460,84 +460,78 @@ body{
     padding:0; gap:0;
     transform:none !important;
     margin:0 !important;
+    position:fixed; inset:0;
   }
 
-  /* hide bg canvas on mobile for perf */
   #bg-canvas{ display:none; }
   body{ background: linear-gradient(180deg,#3d1080 0%,#1a0533 60%,#0d0020 100%); }
 
   /* brand bar */
-  #brand-bar{ padding:4px 0 2px; }
-  #game-logo{ font-size:18px; letter-spacing:1px; }
+  #brand-bar{ padding:3px 0 2px; flex-shrink:0; }
+  #game-logo{ font-size:16px; letter-spacing:1px; }
 
-  /* stage — vertical stack, no left panel */
+  /* stage */
   #stage{
     flex:1; flex-direction:column;
-    padding:0 6px; gap:5px;
-    overflow:hidden;
+    padding:0 4px; gap:4px;
+    overflow:hidden; min-height:0;
   }
 
-  /* hide left panel on mobile — moved to sheet */
   #left-panel{ display:none; }
 
-  /* main game fills all space */
   #main-game{
     flex:1; display:flex; flex-direction:column;
-    gap:5px; min-height:0;
+    gap:4px; min-height:0; overflow:hidden;
   }
 
-  #pays-banner{
-    font-size:9px; letter-spacing:1px; padding:4px 6px;
-  }
+  #pays-banner{ font-size:8px; letter-spacing:1px; padding:3px 6px; flex-shrink:0; }
+  #fs-bar{ font-size:11px; padding:3px 10px; flex-shrink:0; }
 
-  #fs-bar{ font-size:12px; padding:4px 10px; }
+  /* reel fills remaining space */
+  #reel-wrap{ flex:1; min-height:0; border-radius:12px; padding:2px; }
+  #reel-inner{ height:100%; padding:5px; border-radius:11px; }
 
-  /* reel frame fills remaining space */
-  #reel-wrap{ flex:1; min-height:0; }
-  #reel-inner{ height:100%; padding:6px; }
+  /* CRITICAL — force 6 columns, fit in viewport */
   #grid{
     height:100%;
-    grid-template-columns:repeat(6,1fr);
-    grid-template-rows:repeat(5,1fr);
-    gap:4px;
+    display:grid !important;
+    grid-template-columns:repeat(6,1fr) !important;
+    grid-template-rows:repeat(5,1fr) !important;
+    gap:3px !important;
   }
 
-  .cell{ border-radius:9px; }
-  .cell-bg{ border-radius:9px; }
-  .cell-glare{ border-radius:9px; }
+  .cell{ border-radius:8px; }
+  .cell-bg{ border-radius:8px; }
+  .cell-glare{ border-radius:8px; }
 
   /* bottom bar */
   #bottom-bar{
-    padding:8px 10px;
-    border-radius:12px;
-    margin-bottom:4px;
-    flex-shrink:0;
+    padding:6px 8px; border-radius:10px;
+    margin-bottom:3px; flex-shrink:0;
+    gap:6px;
   }
-  .cred-row{ font-size:11px; gap:5px; }
-  #win-msg{ font-size:14px; min-width:120px; }
+  .cred-block{ gap:1px; }
+  .cred-row{ font-size:10px; gap:4px; }
+  #win-msg{ font-size:12px; min-width:90px; }
 
-  /* spin controls */
-  .spin-area{ gap:8px; }
-  .adj-wrap .bet-label{ font-size:8px; }
-  .adj-btn{ width:34px; height:34px; font-size:18px; }
+  /* spin controls — all visible */
+  .spin-area{ gap:6px; align-items:center; }
+  .adj-wrap .bet-label{ font-size:7px; }
+  .adj-btn{ width:32px; height:32px; font-size:17px; }
   #spin-btn{
-    width:58px; height:58px; font-size:26px;
+    width:54px; height:54px; font-size:24px;
     border-width:3px;
   }
-  #auto-btn{ font-size:9px; padding:4px 9px; }
-
-  /* mobile info button — opens side panel */
+  #auto-btn{
+    font-size:9px; padding:4px 8px;
+    border-radius:16px;
+  }
   #mobile-info-btn{
     display:flex; align-items:center; justify-content:center;
-    width:34px; height:34px; border-radius:50%;
+    width:32px; height:32px; border-radius:50%;
     background:rgba(255,210,80,.15); border:1.5px solid rgba(255,210,80,.4);
-    color:var(--gold-bright); font-size:16px; cursor:pointer;
-    font-family:'Lilita One',cursive;
-  }
-
-  /* side sheet overlay */
-  #side-sheet{
-    display:flex;
+    color:var(--gold-bright); font-size:15px; cursor:pointer;
+    font-family:'Lilita One',cursive; flex-shrink:0;
   }
 }
 
@@ -1687,16 +1681,15 @@ init();
 
 // ── VIEWPORT SCALE FIT ──────────────────────────
 function scaleGame(){
+  if(window.innerWidth<=768) return; // mobile handles layout via CSS
   const shell = document.getElementById('game-shell');
   const padV = 24;
   const padH = 32;
-  // Use offsetWidth/offsetHeight for actual rendered size
   const scaleX = (window.innerWidth  - padH) / shell.offsetWidth;
   const scaleY = (window.innerHeight - padV) / shell.offsetHeight;
   const scale  = Math.min(scaleX, scaleY, 1);
   shell.style.transform = `scale(${scale})`;
   shell.style.transformOrigin = 'top left';
-  // Centre horizontally and vertically
   const scaledW = shell.offsetWidth  * scale;
   const scaledH = shell.offsetHeight * scale;
   shell.style.marginLeft = Math.max(0, (window.innerWidth  - scaledW) / 2) + 'px';
